@@ -1,0 +1,302 @@
+﻿<Window x:Class="GPStracking_app.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Симулятор GPS-трекінгу" Height="700" Width="900"
+        MinHeight="620" MinWidth="780"
+        Background="#F1F5F9" WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="ModernComboBoxItem" TargetType="ComboBoxItem">
+            <Setter Property="Padding" Value="10,6"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBoxItem">
+                        <Border x:Name="ItemBorder" Background="Transparent" CornerRadius="4" Padding="{TemplateBinding Padding}" Margin="2,1">
+                            <ContentPresenter />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#EFF6FF"/>
+                                <Setter Property="Foreground" Value="#1D4ED8"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter TargetName="ItemBorder" Property="Background" Value="#DBEAFE"/>
+                                <Setter Property="Foreground" Value="#1E40AF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="ModernComboBox" TargetType="ComboBox">
+            <Setter Property="Height" Value="30"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#0F172A"/>
+            <Setter Property="Background" Value="#F8FAFC"/>
+            <Setter Property="BorderBrush" Value="#CBD5E1"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,0,24,0"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="ItemContainerStyle" Value="{StaticResource ModernComboBoxItem}"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="Border" 
+                                    Background="{TemplateBinding Background}" 
+                                    BorderBrush="{TemplateBinding BorderBrush}" 
+                                    BorderThickness="{TemplateBinding BorderThickness}" 
+                                    CornerRadius="6">
+                                <Grid>
+                                    <ContentPresenter Margin="{TemplateBinding Padding}"
+                                                      HorizontalAlignment="Left"
+                                                      VerticalAlignment="Center"
+                                                      Content="{TemplateBinding SelectionBoxItem}"/>
+                                    <Path Data="M 0 0 L 4 4 L 8 0" 
+                                          Stroke="#64748B" 
+                                          StrokeThickness="1.5" 
+                                          HorizontalAlignment="Right" 
+                                          VerticalAlignment="Center" 
+                                          Margin="0,0,10,0"/>
+                                </Grid>
+                            </Border>
+                            <ToggleButton x:Name="ToggleButton" 
+                                          Focusable="False" 
+                                          ClickMode="Press" 
+                                          IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                <ToggleButton.Template>
+                                    <ControlTemplate TargetType="ToggleButton">
+                                        <Border Background="Transparent"/>
+                                    </ControlTemplate>
+                                </ToggleButton.Template>
+                            </ToggleButton>
+                            <Popup x:Name="Popup" 
+                                   Placement="Bottom" 
+                                   IsOpen="{TemplateBinding IsDropDownOpen}" 
+                                   AllowsTransparency="True" 
+                                   Focusable="False" 
+                                   PopupAnimation="Slide">
+                                <Border x:Name="DropDownBorder" 
+                                        Background="White" 
+                                        BorderBrush="#CBD5E1" 
+                                        BorderThickness="1" 
+                                        CornerRadius="6" 
+                                        Margin="0,4,0,0"
+                                        MinWidth="{TemplateBinding ActualWidth}">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="8" ShadowDepth="2" Opacity="0.1"/>
+                                    </Border.Effect>
+                                    <ScrollViewer Margin="2" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained" />
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#94A3B8"/>
+                                <Setter TargetName="Border" Property="Background" Value="#FFFFFF"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter TargetName="Border" Property="Background" Value="#F1F5F9"/>
+                                <Setter Property="Foreground" Value="#94A3B8"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,10">
+            <Border Background="White" CornerRadius="12" BorderBrush="#CBD5E1" BorderThickness="1" Padding="12">
+                <Grid x:Name="mapContainer">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="GPS Моніторинг" FontWeight="Bold" FontSize="14" Foreground="#0F172A" Margin="0,0,0,8"/>
+
+                    <Border Grid.Row="1" Background="#F8FAFC" CornerRadius="10" BorderBrush="#E2E8F0" BorderThickness="1" Padding="2">
+                        <Canvas x:Name="mapCanvas" Height="180" HorizontalAlignment="Stretch" Loaded="mapCanvas_Loaded" SizeChanged="mapCanvas_SizeChanged">
+                            <Polyline x:Name="routeLine" Stroke="#94A3B8" StrokeThickness="3" StrokeDashArray="4 3"/>
+                            <Polyline x:Name="passedLine" Stroke="#1D4ED8" StrokeThickness="4"/>
+                            <Polyline x:Name="deviationLine" Stroke="#DC2626" StrokeThickness="4" StrokeDashArray="3 2"/>
+
+                            <Ellipse x:Name="pointKyiv" Width="10" Height="10" Fill="#1D4ED8"/>
+                            <TextBlock x:Name="lblKyiv" Text="Київ" FontSize="11" FontWeight="Bold" Foreground="#0F172A"/>
+
+                            <Ellipse x:Name="pointPoltava" Width="10" Height="10" Fill="#1D4ED8"/>
+                            <TextBlock x:Name="lblPoltava" Text="Полтава" FontSize="11" Foreground="#334155"/>
+
+                            <Ellipse x:Name="pointLubny" Width="10" Height="10" Fill="#1D4ED8"/>
+                            <TextBlock x:Name="lblLubny" Text="Лубни" FontSize="11" Foreground="#334155"/>
+
+                            <Ellipse x:Name="pointKharkiv" Width="10" Height="10" Fill="#16A34A"/>
+                            <TextBlock x:Name="lblKharkiv" Text="Харків" FontSize="11" FontWeight="Bold" Foreground="#0F172A"/>
+
+                            <Ellipse x:Name="truckMarker" Width="18" Height="18" Fill="#2563EB" Stroke="#FFFFFF" StrokeThickness="2">
+                                <Ellipse.Effect>
+                                    <DropShadowEffect BlurRadius="6" ShadowDepth="2" Opacity="0.3"/>
+                                </Ellipse.Effect>
+                            </Ellipse>
+                        </Canvas>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid Margin="0,8,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="White" CornerRadius="10" BorderBrush="#CBD5E1" BorderThickness="1" Padding="8" Margin="0,0,3,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock x:Name="txtSpeed" Text="0 км/год" FontSize="16" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Швидкість" FontSize="10" Foreground="#64748B" Margin="0,1,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Background="White" CornerRadius="10" BorderBrush="#CBD5E1" BorderThickness="1" Padding="8" Margin="2,0,2,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock x:Name="txtProgress" Text="0%" FontSize="16" FontWeight="Bold" Foreground="#0F172A" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Маршрут пройдено" FontSize="10" Foreground="#64748B" Margin="0,1,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Background="White" CornerRadius="10" BorderBrush="#CBD5E1" BorderThickness="1" Padding="8" Margin="3,0,0,0">
+                    <StackPanel HorizontalAlignment="Center">
+                        <TextBlock x:Name="txtStatus" Text="Очікування" FontSize="16" FontWeight="Bold" Foreground="#1D4ED8" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Загальний статус" FontSize="10" Foreground="#64748B" Margin="0,1,0,0" HorizontalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Background="White" CornerRadius="12" BorderBrush="#CBD5E1" BorderThickness="1" Padding="12" Margin="0,0,5,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Панель Менеджера" FontWeight="Bold" FontSize="15" Foreground="#0F172A" Margin="0,0,0,8"/>
+
+                    <Grid Grid.Row="1" Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <ComboBox Grid.Column="0" x:Name="cmbTransportType" Width="95" Style="{StaticResource ModernComboBox}" SelectedIndex="0" Margin="0,0,4,0">
+                            <ComboBoxItem Content="Вантажівка" IsSelected="True"/>
+                            <ComboBoxItem Content="Потяг"/>
+                        </ComboBox>
+
+                        <Button Grid.Column="1" x:Name="btnRegister" Content="Зареєструвати" Height="30" Width="95" 
+                                Background="#0F172A" Foreground="White" FontWeight="Bold" FontSize="11"
+                                BorderThickness="0" Click="btnRegister_Click" Margin="0,0,4,0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <Button Grid.Column="2" x:Name="btnAllowTrip" Content="Дозволити виїзд" Width="100" 
+                                Background="#E2E8F0" Foreground="#64748B" FontWeight="Bold" FontSize="11"
+                                BorderThickness="0" IsEnabled="False" Click="btnAllowTrip_Click" Margin="0,0,4,0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+
+                        <Button Grid.Column="3" x:Name="btnReset" Content="Очистити журнал" Height="30" HorizontalAlignment="Right"
+                                Background="#FEF2F2" Foreground="#DC2626" FontWeight="Bold" FontSize="11"
+                                BorderThickness="1" BorderBrush="#FECACA" Click="btnReset_Click" Padding="10,0">
+                            <Button.Resources>
+                                <Style TargetType="Border">
+                                    <Setter Property="CornerRadius" Value="6"/>
+                                </Style>
+                            </Button.Resources>
+                        </Button>
+                    </Grid>
+
+                    <Border Grid.Row="2" Background="#F8FAFC" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Журнал подій рейсу" FontWeight="Bold" FontSize="12" Foreground="#334155" Margin="0,0,0,4"/>
+                            <ListBox Grid.Row="1" x:Name="logManagerBox" FontSize="11" BorderThickness="0" Background="Transparent"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="1" Background="White" CornerRadius="12" BorderBrush="#CBD5E1" BorderThickness="1" Padding="12" Margin="5,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Grid.Row="0" Text="Панель Клієнта" FontWeight="Bold" FontSize="15" Foreground="#0F172A" Margin="0,0,0,8"/>
+
+                    <Border Grid.Row="1" x:Name="statusAlertBorder" Background="#F8FAFC" CornerRadius="8" Padding="8" Margin="0,0,0,8" BorderBrush="#E2E8F0" BorderThickness="1">
+                        <TextBlock x:Name="txtCustomerAlert" Text="Очікування реєстрації посилки..." FontWeight="SemiBold" FontSize="12" Foreground="#475569" TextWrapping="Wrap"/>
+                    </Border>
+
+                    <Button Grid.Row="2" x:Name="btnPickUp" Content="Забрати посилку" Height="30" 
+                            Background="#E2E8F0" Foreground="#64748B" FontWeight="Bold" FontSize="12"
+                            BorderThickness="0" IsEnabled="False" Margin="0,0,0,8" Click="btnPickUp_Click">
+                        <Button.Resources>
+                            <Style TargetType="Border">
+                                <Setter Property="CornerRadius" Value="6"/>
+                            </Style>
+                        </Button.Resources>
+                    </Button>
+
+                    <Border Grid.Row="3" Background="#F8FAFC" CornerRadius="8" BorderBrush="#E2E8F0" BorderThickness="1" Padding="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Відстеження посилки" FontWeight="Bold" FontSize="12" Foreground="#334155" Height="16" VerticalAlignment="Top"/>
+                            <ListBox Grid.Row="1" x:Name="logCustomerBox" FontSize="11" BorderThickness="0" Background="Transparent"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Window>
